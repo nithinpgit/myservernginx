@@ -1,0 +1,48 @@
+# HTTP server
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server ipv6only=on;
+
+	root /usr/share/nginx/nithin.online;
+	index index.html index.php;
+	server_name nithin.online;
+	location / {
+		try_files $uri $uri/ =404;
+	}
+    
+	location ~ \.php$ {
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_index index.php;
+		fastcgi_read_timeout 3600;
+		include fastcgi_params;
+	}
+}
+
+# HTTPS server
+server {
+	listen 443;
+	server_name nithin.online;
+	root /usr/share/nginx/nithin.online;
+	index index.html index.htm index.php;
+	ssl on;
+	ssl_certificate /home/ubuntu/cert/server.crt;
+	ssl_certificate_key /home/ubuntu/cert/server.key;
+	ssl_session_timeout 5m;
+	ssl_protocols SSLv3 TLSv1 TLSv1.1 TLSv1.2;
+	ssl_ciphers "HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";
+	ssl_prefer_server_ciphers on;
+
+	location / {
+	    add_header 'Access-Control-Allow-Origin' *;
+		try_files $uri $uri/ =404;
+	}
+     
+	location ~ \.php$ {
+		fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_index index.php;
+		fastcgi_read_timeout 3600;
+		include fastcgi_params;
+	}
+}
